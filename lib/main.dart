@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petcaremovil/src/pages/ListaCompras.dart';
+import 'package:petcaremovil/src/pages/Products.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
           bodyText1: TextStyle(color: Colors.white),
         ),
       ),
-      home: ListaCompras(idprofile: ""),
+      home: Products(idprofile: ""),
     );
   }
 }
