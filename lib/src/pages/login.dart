@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 //import 'package:app-pet-care/src/models/Login.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   // Initially password is obscure
@@ -25,17 +26,17 @@ class _State extends State<LoginPage> {
       HttpHeaders.contentTypeHeader: "application/json",
     };
 
-    Uri uri = Uri.http(url, 'user');
+    Uri uri = Uri.http(url, 'user', params);
     print(uri);
     print(header);
     print(jsonEncode(params));
-    final response = await http.post(uri,
-        headers: {
-          HttpHeaders.contentTypeHeader: "application/json",
-        },
-        body: jsonEncode(params));
+    final response = await http.post(uri, headers: {
+      HttpHeaders.contentTypeHeader: "application/json",
+    });
 
-    if (response.statusCode == 200) {
+    print(response.bodyBytes.length);
+
+    if (response.statusCode == 200 && response.bodyBytes.length != 0) {
       String body = utf8.decode(response.bodyBytes);
       final jsonData = jsonDecode(body);
 
@@ -70,7 +71,7 @@ class _State extends State<LoginPage> {
         Container(
           alignment: Alignment.center,
           padding: EdgeInsets.fromLTRB(60, 100, 60, 40),
-          //child: Image.asset("assets/iconoLogin.png", width: 170, height: 170),
+          child: Image.asset("assets/iconoLogin.png", width: 170, height: 170),
         ),
         Container(
           padding: EdgeInsets.fromLTRB(60, 10, 60, 20),
@@ -130,9 +131,18 @@ class _State extends State<LoginPage> {
                 loginFinal =
                     postLogin(nameController.text, passwordController.text);
                 loginFinal.then((value) => {
+                      //TODO
                       if (value == null)
                         {
                           print("ERROR - Revise los datos ingresados"),
+                          Fluttertoast.showToast(
+                              msg: 'Revise los datos ingresados',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIos: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 20.0)
                         }
                       else
                         {
@@ -143,6 +153,14 @@ class _State extends State<LoginPage> {
                             value[0].token,
                             value[0].email,
                           ),
+                          Fluttertoast.showToast(
+                              msg: 'Inicio de sesión correcto',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIos: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 20.0),
                         }
                     });
               },
