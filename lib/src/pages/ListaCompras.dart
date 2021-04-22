@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -20,11 +21,9 @@ class ListaCompras extends StatelessWidget {
 
   Future<List<Venta>> fetchCompras(http.Client client) async {
     final response = await http
-        .get(Uri.http('169.254.113.6:8000', 'API/comprasJSON/15'), headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Authorization":
-          "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwMzQ3ODQsImV4cCI6MTYxOTA1Mjc4NH0.2jQVVHDYSXsCIZYkUHezCBJA1LlWZV8IjhaMbARQbp2S_MX6KA9zVqSizS_1rrzp5aMqOOICKw5N1qhR4pubKQ"
+        .get(Uri.http('127.0.0.1:8000', 'API/comprasJSON/18'), headers: {
+      HttpHeaders.authorizationHeader:
+          "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwNTY3OTQsImV4cCI6MTYxOTA3NDc5NH0.bQDD_pvpEVWL59kU4PcxCK5cQYAQh7QZueK4YyDuC_Rs5_ObKamzkqLld2wonUqW6ivkPbBsicG1AlamBABJ3g"
     });
     print("---->" + response.body);
     return parseListVentas(response.body);
@@ -35,7 +34,7 @@ class ListaCompras extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Mis Compras Realizadasx"),
+        title: Text("Mis Compras Realizadas"),
         elevation: 0,
       ),
       body: FutureBuilder<List<Venta>>(
