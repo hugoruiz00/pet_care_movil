@@ -21,7 +21,7 @@ class ListaCompras extends StatelessWidget {
 
   Future<List<Venta>> fetchCompras(http.Client client) async {
     final response = await http
-        .get(Uri.http('127.0.0.1:8000', 'API/comprasJSON/18'), headers: {
+        .get(Uri.http('127.0.0.1:8000', 'API/compras/$idowner'), headers: {
       HttpHeaders.authorizationHeader:
           "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwNTY3OTQsImV4cCI6MTYxOTA3NDc5NH0.bQDD_pvpEVWL59kU4PcxCK5cQYAQh7QZueK4YyDuC_Rs5_ObKamzkqLld2wonUqW6ivkPbBsicG1AlamBABJ3g"
     });

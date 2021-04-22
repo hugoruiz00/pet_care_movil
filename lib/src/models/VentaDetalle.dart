@@ -1,15 +1,13 @@
 class VentaDetalle {
   final int id;
-  final int ventaid;
-  final int productoid;
+  final String producto;
   final int cantidad;
-  final int precio;
-  final int subtotal;
+  final double precio;
+  final double subtotal;
 
   VentaDetalle({
     this.id,
-    this.ventaid,
-    this.productoid,
+    this.producto,
     this.cantidad,
     this.precio,
     this.subtotal,
@@ -18,8 +16,7 @@ class VentaDetalle {
   factory VentaDetalle.fromJson(Map<String, dynamic> json) {
     return VentaDetalle(
       id: json['id'],
-      ventaid: json['venta_id'],
-      productoid: json['producto_id'],
+      producto: json['producto'],
       cantidad: json['cantidad'],
       precio: json['precio'],
       subtotal: json['subtotal'],
