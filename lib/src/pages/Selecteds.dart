@@ -3,17 +3,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:petcaremovil/src/models/Login.dart';
 import 'package:petcaremovil/src/models/Selected.dart';
 import 'package:petcaremovil/src/pages/Compra.dart';
+import 'package:petcaremovil/src/pages/ListaCompras.dart';
 import 'package:petcaremovil/src/pages/Payment.dart';
 import 'package:petcaremovil/src/pages/Products.dart';
 
 class Selecteds extends StatelessWidget {
-  final String idprofile;
+  final Login user;
 
-  final String jwt =
-      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwMjgxNDIsImV4cCI6MTYxOTA0NjE0Mn0.uIQhIKhnndJ73KWOAyVvQNnJBxD6FuvBVMboPR6ggWo82ThAeBycADYtxLyOG74MSRRiQscrGoggpu3OhR-dXw";
-  Selecteds({Key keys, @required this.idprofile}) : super(key: keys);
+  Selecteds({Key keys, @required this.user}) : super(key: keys);
 
   List<Selected> parseListSelecteds(String reponseBody) {
     final parsed = jsonDecode(reponseBody).cast<Map<String, dynamic>>();
@@ -22,8 +22,8 @@ class Selecteds extends StatelessWidget {
 
   Future<List<Selected>> fetchSelecteds(http.Client client) async {
     final response = await http.get(
-        Uri.http('192.168.0.105:8080', 'API/selecteds/12@12'),
-        headers: {HttpHeaders.authorizationHeader: jwt});
+        Uri.http('192.168.0.105:8080', 'API/selecteds/' + user.email),
+        headers: {HttpHeaders.authorizationHeader: user.token});
 
     return parseListSelecteds(response.body);
   }
@@ -47,7 +47,7 @@ class Selecteds extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => Products(
-                    idprofile: "",
+                    user: user,
                   ),
                 ),
               );
@@ -64,7 +64,24 @@ class Selecteds extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => Payment(
-                    idprofile: "",
+                    user: user,
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.badge,
+              color: Colors.white,
+              size: 32,
+            ),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ListaCompras(
+                    user: user,
                   ),
                 ),
               );
@@ -78,7 +95,10 @@ class Selecteds extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
 
           return snapshot.hasData
-              ? ListSelectedsClass(listSelecteds: snapshot.data)
+              ? ListSelectedsClass(
+                  listSelecteds: snapshot.data,
+                  user: user,
+                )
               : Center(child: CircularProgressIndicator());
         },
       ),
@@ -88,18 +108,18 @@ class Selecteds extends StatelessWidget {
 
 class ListSelectedsClass extends StatefulWidget {
   final List<Selected> listSelecteds;
-  ListSelectedsClass({Key keys, @required this.listSelecteds})
+  final Login user;
+  ListSelectedsClass({Key keys, @required this.listSelecteds, this.user})
       : super(key: keys);
   @override
-  ListSelecteds createState() => ListSelecteds(listSelecteds: listSelecteds);
+  ListSelecteds createState() =>
+      ListSelecteds(listSelecteds: listSelecteds, user: user);
 }
 
 class ListSelecteds extends State<ListSelectedsClass> {
   List<Selected> listSelecteds;
-  final String jwt =
-      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwMTAwNzksImV4cCI6MTYxOTAyODA3OX0.CViRxBIjJ2c_r32o4md7E7odVvpuLRJZDPWV-HuBjfvwjkMmnL-duM8TzwiCEjquEmijdelcKh1DpCMi6unFKg";
-
-  ListSelecteds({Key key, this.listSelecteds});
+  final Login user;
+  ListSelecteds({Key key, this.listSelecteds, this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -135,18 +155,16 @@ class ListSelecteds extends State<ListSelectedsClass> {
                                 color: Theme.of(context).secondaryHeaderColor,
                                 iconSize: 30,
                                 onPressed: () {
-                                  addProduct("12@12",
-                                          listSelecteds[index].cantidad, 1, jwt)
-                                      .then((value) => {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Compra(
-                                                  idcompra: "17",
-                                                ),
-                                              ),
-                                            )
-                                          });
+                                  deleteSelected(listSelecteds[index].id, user.token).then((value) => {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Selecteds(
+                                              user: user,
+                                            ),
+                                          ),
+                                        )
+                                      });
                                 },
                               )
                             ]),
@@ -204,4 +222,11 @@ Future<String> addProduct(
   } else {
     return "ok";
   }
+}
+
+Future<String> deleteSelected(int id, String token) async {
+  final response = await http.get(
+      Uri.http('192.168.0.105:8080', 'API/deleteProduct/' + id.toString()),
+      headers: {HttpHeaders.authorizationHeader: token});
+  return response.body;
 }

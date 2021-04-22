@@ -1,31 +1,30 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:petcaremovil/src/models/Login.dart';
 
 import 'package:petcaremovil/src/models/venta.dart';
 import 'package:petcaremovil/src/pages/Compra.dart';
 
 class ListaCompras extends StatelessWidget {
-  final String idprofile;
+  final Login user;
 
-  ListaCompras({Key keys, @required this.idprofile}) : super(key: keys);
+  ListaCompras({Key keys, @required this.user}) : super(key: keys);
 
   List<Venta> parseListVentas(String reponseBody) {
     final parsed = jsonDecode(reponseBody).cast<Map<String, dynamic>>();
+    print("--->" + parsed);
     return parsed.map<Venta>((json) => Venta.fromJson(json)).toList();
   }
 
   Future<List<Venta>> fetchCompras(http.Client client) async {
     final response = await http.get(
-        Uri.parse('http://34.239.109.204/api/v1/profile/profile_detail/42/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Token cbb26288d097255ebf4e4a02339ad53561e64c40"
-        });
-
+        Uri.http('192.168.0.105:8080', 'API/compras/' + user.id.toString()),
+        headers: {HttpHeaders.authorizationHeader: user.token});
+    print("---->" + response.body);
     return parseListVentas(response.body);
   }
 
@@ -90,8 +89,7 @@ class ListCompras extends StatelessWidget {
                                 left: 10, top: 8.0, bottom: 4.0),
                             child: Row(children: <Widget>[
                               Text(
-                                //listCompras[index].name,
-                                "\$ 1500",
+                                "\$ ${listCompras[index].total}",
                                 style: Theme.of(context).textTheme.headline1,
                               ),
                               Spacer(),
@@ -107,8 +105,7 @@ class ListCompras extends StatelessWidget {
                             child: Row(children: <Widget>[
                               Text(
                                 //"${DateFormat('dd/MM/yyyy').format(trip.startDate).toString()} - ${DateFormat('dd/MM/yyyy').format(trip.endDate).toString()}"),
-                                //listCompras[index].email,
-                                "12-05-2020",
+                                listCompras[index].fecha,
                                 style: Theme.of(context).textTheme.bodyText1,
                               ),
                             ]),
@@ -119,7 +116,7 @@ class ListCompras extends StatelessWidget {
                             child: Row(
                               children: <Widget>[
                                 Text(
-                                  "Pago: Tarjeta",
+                                  listCompras[index].metodopago,
                                   style: Theme.of(context).textTheme.headline3,
                                 ),
                               ],

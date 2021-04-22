@@ -6,37 +6,39 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:petcaremovil/src/models/InfoPayment.dart';
+import 'package:petcaremovil/src/models/Login.dart';
 import 'package:petcaremovil/src/pages/Products.dart';
 import 'package:petcaremovil/src/pages/Selecteds.dart';
 
 class Payment extends StatefulWidget {
-  final String idprofile;
-  Payment({Key keys, @required this.idprofile}) : super(key: keys);
+  final Login user;
+  Payment({Key keys, @required this.user}) : super(key: keys);
   @override
-  State<Payment> createState() => _PaymentState(idprofile: idprofile);
+  State<Payment> createState() => _PaymentState(user: user);
 }
 
 class _PaymentState extends State<Payment> {
-  final String jwt =
-      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwMjgxNDIsImV4cCI6MTYxOTA0NjE0Mn0.uIQhIKhnndJ73KWOAyVvQNnJBxD6FuvBVMboPR6ggWo82ThAeBycADYtxLyOG74MSRRiQscrGoggpu3OhR-dXw";
-
-  final TextEditingController _cntrlrMetodoPago = TextEditingController();
   final TextEditingController _cntrlrTotal = TextEditingController();
-  final TextEditingController _cntrlrUsername = TextEditingController();
 
-  final String idprofile;
-  _PaymentState({@required this.idprofile});
+  final Login user;
+  _PaymentState({@required this.user});
 
   Future<InfoPayment> _futureInfo;
   String error = "";
   @override
   void initState() {
     super.initState();
-    _futureInfo = getInfoPayment(jwt);
-    this._cntrlrMetodoPago.text = "tarjetaa";
-    this._cntrlrTotal.text = 100.0.toString();
-    this._cntrlrUsername.text = "12@12";
+    _futureInfo = getInfoPayment(user.email, user.token);
+    _futureInfo.then((value) => {
+          _cntrlrTotal.text = value.total.toString(),
+        });
   }
+
+  static const values = <String>['Tarjeta', 'Paypal', 'Transferencia'];
+  String selectedValue = values.first;
+
+  final selectedColor = Colors.green;
+  final unselectedColor = Colors.white;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,9 +56,7 @@ class _PaymentState extends State<Payment> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Products(
-                      idprofile: "",
-                    ),
+                    builder: (context) => Products(user: user),
                   ),
                 );
               },
@@ -71,9 +71,7 @@ class _PaymentState extends State<Payment> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Selecteds(
-                      idprofile: "",
-                    ),
+                    builder: (context) => Selecteds(user: user),
                   ),
                 );
               },
@@ -111,6 +109,7 @@ class _PaymentState extends State<Payment> {
                                             fontSize: 20.0,
                                             color: Colors.white),
                                       ),
+                                      buildRadios()
                                     ],
                                   )),
                                 ),
@@ -165,11 +164,11 @@ class _PaymentState extends State<Payment> {
     String texto = "";
     double size = 0.0;
     if (_cntrlrTotal.text == "0.0") {
-      texto = "Realizar pago";
-      size = 20.0;
-    } else {
       texto = "Agregar productos";
       size = 17.5;
+    } else {
+      texto = "Realizar pago";
+      size = 20.0;
     }
     return ElevatedButton(
       child: Text(
@@ -177,25 +176,51 @@ class _PaymentState extends State<Payment> {
         style: TextStyle(fontSize: size),
       ),
       onPressed: () {
-        pay(_cntrlrUsername.text, _cntrlrMetodoPago.text,
-                double.parse(_cntrlrTotal.text), jwt)
+        pay(user.email, selectedValue, double.parse(_cntrlrTotal.text),
+                user.token)
             .then((value) => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => Products(
-                      idprofile: "",
+                      user: user,
                     ),
                   ),
                 ));
       },
     );
   }
+
+  Widget buildRadios() => Theme(
+        data: Theme.of(context).copyWith(
+          unselectedWidgetColor: unselectedColor,
+        ),
+        child: Column(
+          children: values.map(
+            (value) {
+              final selected = this.selectedValue == value;
+              final color = selected ? selectedColor : unselectedColor;
+
+              return RadioListTile<String>(
+                value: value,
+                groupValue: selectedValue,
+                title: Text(
+                  value,
+                  style: TextStyle(color: color),
+                ),
+                activeColor: selectedColor,
+                onChanged: (value) =>
+                    setState(() => this.selectedValue = value),
+              );
+            },
+          ).toList(),
+        ),
+      );
 }
 
-Future<InfoPayment> getInfoPayment(String jwt) async {
+Future<InfoPayment> getInfoPayment(String user, String token) async {
   final response = await http.get(
-    Uri.http('192.168.0.105:8080', 'API/infoPayment/12@12'),
-    headers: {HttpHeaders.authorizationHeader: jwt},
+    Uri.http('192.168.0.105:8080', 'API/infoPayment/' + user),
+    headers: {HttpHeaders.authorizationHeader: token},
   );
   print(response.statusCode);
   if (response.statusCode == 200) {

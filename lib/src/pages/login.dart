@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 //import 'package:app-pet-care/src/models/Login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:petcaremovil/src/models/Login.dart';
+import 'package:petcaremovil/src/pages/Products.dart';
 
 class LoginPage extends StatefulWidget {
   // Initially password is obscure
@@ -18,7 +20,7 @@ class _State extends State<LoginPage> {
   Future<List<Login>> postLogin(String user, String password) async {
     List<Login> login = [];
 
-    String url = '192.168.1.69:8080';
+    String url = '192.168.0.105:8080';
 
     Map<String, String> params = {"user": user, "password": password};
 
@@ -40,7 +42,7 @@ class _State extends State<LoginPage> {
       String body = utf8.decode(response.bodyBytes);
       final jsonData = jsonDecode(body);
 
-      login.add(Login(jsonData['token'], jsonData['user']));
+      login.add(Login(jsonData['id'],jsonData['token'], jsonData['user']));
       return login;
     } else {
       var response1 = response.body;
@@ -150,6 +152,7 @@ class _State extends State<LoginPage> {
                           print("Token user: "),
                           print(value[0].token),
                           loginD = Login(
+                            value[0].id,
                             value[0].token,
                             value[0].email,
                           ),
@@ -161,6 +164,13 @@ class _State extends State<LoginPage> {
                               backgroundColor: Colors.black,
                               textColor: Colors.white,
                               fontSize: 20.0),
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Products(
+                                      user: this.loginD,
+                                    )),
+                          ),
                         }
                     });
               },
@@ -185,15 +195,5 @@ class _State extends State<LoginPage> {
             ))
       ],
     )));
-  }
-}
-
-class Login {
-  String token;
-  String email;
-
-  Login(String token, String email) {
-    this.token = token;
-    this.email = email;
   }
 }

@@ -1,29 +1,27 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-
-import 'package:petcaremovil/src/models/venta.dart';
+import 'package:petcaremovil/src/models/VentaDetalle.dart';
 
 class Compra extends StatelessWidget {
   final String idcompra;
 
   Compra({Key keys, @required this.idcompra}) : super(key: keys);
 
-  List<Venta> parseListProductos(String reponseBody) {
+  List<VentaDetalle> parseListProductos(String reponseBody) {
     final parsed = jsonDecode(reponseBody).cast<Map<String, dynamic>>();
-    return parsed.map<Venta>((json) => Venta.fromJson(json)).toList();
+    return parsed.map<VentaDetalle>((json) => VentaDetalle.fromJson(json)).toList();
   }
 
-  Future<List<Venta>> fetchDetalles(http.Client client) async {
-    final response = await http.get(
-        Uri.parse('http://34.239.109.204/api/v1/profile/profile_detail/42/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Token cbb26288d097255ebf4e4a02339ad53561e64c40"
-        });
+  Future<List<VentaDetalle>> fetchDetalles(http.Client client) async {
+    final response = await http
+        .get(Uri.http('127.0.0.1:8000', 'API/compraDetalle/$idcompra'), headers: {
+      HttpHeaders.authorizationHeader:
+      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwNTY3OTQsImV4cCI6MTYxOTA3NDc5NH0.bQDD_pvpEVWL59kU4PcxCK5cQYAQh7QZueK4YyDuC_Rs5_ObKamzkqLld2wonUqW6ivkPbBsicG1AlamBABJ3g"
+    });
     return parseListProductos(response.body);
   }
 
@@ -35,7 +33,7 @@ class Compra extends StatelessWidget {
         title: Text("Detalles de la Compra"),
         elevation: 0,
       ),
-      body: FutureBuilder<List<Venta>>(
+      body: FutureBuilder<List<VentaDetalle>>(
         future: fetchDetalles(http.Client()),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
@@ -50,7 +48,7 @@ class Compra extends StatelessWidget {
 }
 
 class ListDetalles extends StatelessWidget {
-  final List<Venta> listCompras;
+  final List<VentaDetalle> listCompras;
 
   ListDetalles({Key key, this.listCompras}) : super(key: key);
 
@@ -75,8 +73,7 @@ class ListDetalles extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 8.0, bottom: 10.0),
                       child: Row(children: <Widget>[
                         Text(
-                          //listCompras[index].name, producto
-                          "Mi producto",
+                          listCompras[index].producto,
                           style: Theme.of(context).textTheme.headline3,
                         ),
                         Spacer(),
@@ -86,8 +83,7 @@ class ListDetalles extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 4.0, bottom: 5.0),
                       child: Row(children: <Widget>[
                         Text(
-                            //"${DateFormat('dd/MM/yyyy').format(trip.startDate).toString()} - ${DateFormat('dd/MM/yyyy').format(trip.endDate).toString()}"),
-                            "Cantidad : 50",
+                            "Cantidad : ${listCompras[index].cantidad}",
                             style: Theme.of(context).textTheme.bodyText1),
                       ]),
                     ),
@@ -95,7 +91,7 @@ class ListDetalles extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                       child: Row(
                         children: <Widget>[
-                          Text("Precio \$15.50",
+                          Text("Precio \$ ${listCompras[index].precio}",
                               style: Theme.of(context).textTheme.bodyText1),
                         ],
                       ),
@@ -105,7 +101,7 @@ class ListDetalles extends StatelessWidget {
                       child: Row(
                         children: <Widget>[
                           Text(
-                            "Subtotal \$2500.50",
+                            "Subtotal: \$ ${listCompras[index].subtotal}",
                             style: new TextStyle(
                                 fontSize: 18.0, color: Colors.white),
                           ),
