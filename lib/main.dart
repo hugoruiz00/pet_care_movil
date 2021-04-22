@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           bodyText1: TextStyle(color: Colors.white),
         ),
       ),
-      home: ListaCompras(idprofile: ""),
+      home: ListaCompras(idowner: 18),
     );
   }
 }
