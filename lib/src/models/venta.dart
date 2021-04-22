@@ -2,7 +2,7 @@ class Venta {
   final int id;
   final int idOwner;
   final String metodopago;
-  final String total;
+  final double total;
   final String fecha;
 
   Venta({this.id, this.idOwner, this.metodopago, this.total, this.fecha});

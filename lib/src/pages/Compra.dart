@@ -4,24 +4,26 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:petcaremovil/src/models/Login.dart';
 import 'package:petcaremovil/src/models/VentaDetalle.dart';
 
 class Compra extends StatelessWidget {
   final String idcompra;
-
-  Compra({Key keys, @required this.idcompra}) : super(key: keys);
+  final Login user;
+  Compra({Key keys, @required this.idcompra, this.user}) : super(key: keys);
 
   List<VentaDetalle> parseListProductos(String reponseBody) {
+    print(reponseBody+" AAAAAAAAAAAA");
     final parsed = jsonDecode(reponseBody).cast<Map<String, dynamic>>();
-    return parsed.map<VentaDetalle>((json) => VentaDetalle.fromJson(json)).toList();
+    return parsed
+        .map<VentaDetalle>((json) => VentaDetalle.fromJson(json))
+        .toList();
   }
 
   Future<List<VentaDetalle>> fetchDetalles(http.Client client) async {
-    final response = await http
-        .get(Uri.http('127.0.0.1:8000', 'API/compraDetalle/$idcompra'), headers: {
-      HttpHeaders.authorizationHeader:
-      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJwZXRKV1QiLCJzdWIiOiIxMkAxMiIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE2MTkwNTY3OTQsImV4cCI6MTYxOTA3NDc5NH0.bQDD_pvpEVWL59kU4PcxCK5cQYAQh7QZueK4YyDuC_Rs5_ObKamzkqLld2wonUqW6ivkPbBsicG1AlamBABJ3g"
-    });
+    final response = await http.get(
+        Uri.http('192.168.0.105:8080', 'API/compraDetalle/$idcompra'),
+        headers: {HttpHeaders.authorizationHeader: user.token});
     return parseListProductos(response.body);
   }
 
@@ -82,8 +84,7 @@ class ListDetalles extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0, bottom: 5.0),
                       child: Row(children: <Widget>[
-                        Text(
-                            "Cantidad : ${listCompras[index].cantidad}",
+                        Text("Cantidad : ${listCompras[index].cantidad}",
                             style: Theme.of(context).textTheme.bodyText1),
                       ]),
                     ),

@@ -8,6 +8,8 @@ import 'package:petcaremovil/src/models/Login.dart';
 
 import 'package:petcaremovil/src/models/venta.dart';
 import 'package:petcaremovil/src/pages/Compra.dart';
+import 'package:petcaremovil/src/pages/Payment.dart';
+import 'package:petcaremovil/src/pages/Products.dart';
 
 class ListaCompras extends StatelessWidget {
   final Login user;
@@ -16,7 +18,6 @@ class ListaCompras extends StatelessWidget {
 
   List<Venta> parseListVentas(String reponseBody) {
     final parsed = jsonDecode(reponseBody).cast<Map<String, dynamic>>();
-    print("--->" + parsed);
     return parsed.map<Venta>((json) => Venta.fromJson(json)).toList();
   }
 
@@ -35,6 +36,42 @@ class ListaCompras extends StatelessWidget {
         centerTitle: true,
         title: Text("Mis Compras Realizadas"),
         elevation: 0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add_shopping_cart_sharp,
+              color: Colors.white,
+              size: 32,
+            ),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Products(
+                    user: user,
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.monetization_on,
+              color: Colors.white,
+              size: 32,
+            ),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Payment(
+                    user: user,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<List<Venta>>(
         future: fetchCompras(http.Client()),
@@ -42,7 +79,10 @@ class ListaCompras extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
 
           return snapshot.hasData
-              ? ListCompras(listCompras: snapshot.data)
+              ? ListCompras(
+                  listCompras: snapshot.data,
+                  user: user,
+                )
               : Center(child: CircularProgressIndicator());
         },
       ),
@@ -52,8 +92,9 @@ class ListaCompras extends StatelessWidget {
 
 class ListCompras extends StatelessWidget {
   final List<Venta> listCompras;
+  final Login user;
 
-  ListCompras({Key key, this.listCompras}) : super(key: key);
+  ListCompras({Key key, this.listCompras, this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +116,8 @@ class ListCompras extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => Compra(
-                            idcompra: index.toString(),
+                            idcompra: listCompras[index].id.toString(),
+                            user: user,
                           ),
                         ),
                       );
