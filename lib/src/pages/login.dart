@@ -175,24 +175,6 @@ class _State extends State<LoginPage> {
                     });
               },
             )),
-        Container(
-            padding: EdgeInsets.all(30),
-            child: Row(
-              children: <Widget>[
-                Text('¿No tienes una cuenta?', style: TextStyle(fontSize: 14)),
-                FlatButton(
-                  textColor: Colors.blue,
-                  child: Text(
-                    'Registrate',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  onPressed: () {
-                    print("Regístrate");
-                  },
-                )
-              ],
-              mainAxisAlignment: MainAxisAlignment.center,
-            ))
       ],
     )));
   }
