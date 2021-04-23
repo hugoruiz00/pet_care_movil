@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:petcaremovil/src/models/Login.dart';
 import 'package:petcaremovil/src/pages/Products.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class LoginPage extends StatefulWidget {
   // Initially password is obscure
@@ -42,7 +44,7 @@ class _State extends State<LoginPage> {
       String body = utf8.decode(response.bodyBytes);
       final jsonData = jsonDecode(body);
 
-      login.add(Login(jsonData['id'],jsonData['token'], jsonData['user']));
+      login.add(Login(jsonData['id'], jsonData['token'], jsonData['user']));
       return login;
     } else {
       var response1 = response.body;
@@ -175,6 +177,25 @@ class _State extends State<LoginPage> {
                     });
               },
             )),
+        Container(
+            padding: EdgeInsets.all(30),
+            child: Row(
+              children: <Widget>[
+                Text('¿No sabe cómo usar la app?', style: TextStyle(fontSize: 14)),
+                FlatButton(
+                  textColor: Colors.blue,
+                  child: Text(
+                    'Ver manual',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onPressed: () {
+                    print("Ver manual");
+                    launch("https://drive.google.com/drive/u/1/folders/1uRk8S7E3rAXKAVPY1Us-W6xzytI-93-8");
+                  },
+                )
+              ],
+              mainAxisAlignment: MainAxisAlignment.center,
+            ))
       ],
     )));
   }
