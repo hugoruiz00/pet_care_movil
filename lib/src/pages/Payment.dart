@@ -219,7 +219,7 @@ class _PaymentState extends State<Payment> {
 
 Future<InfoPayment> getInfoPayment(String user, String token) async {
   final response = await http.get(
-    Uri.http('192.168.0.105:8080', 'API/infoPayment/' + user),
+    Uri.http('192.168.0.102:8080', 'API/infoPayment/' + user),
     headers: {HttpHeaders.authorizationHeader: token},
   );
   print(response.statusCode);
@@ -233,7 +233,7 @@ Future<InfoPayment> getInfoPayment(String user, String token) async {
 Future<String> pay(
     String username, String metodoPago, double total, String jwt) async {
   final http.Response response = await http.post(
-    Uri.http('192.168.0.105:8080', 'API/pay'),
+    Uri.http('192.168.0.102:8080', 'API/pay'),
     headers: {
       HttpHeaders.authorizationHeader: jwt,
       HttpHeaders.contentTypeHeader: "application/json",

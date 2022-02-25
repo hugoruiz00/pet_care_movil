@@ -22,7 +22,7 @@ class Selecteds extends StatelessWidget {
 
   Future<List<Selected>> fetchSelecteds(http.Client client) async {
     final response = await http.get(
-        Uri.http('192.168.0.105:8080', 'API/selecteds/' + user.email),
+        Uri.http('192.168.0.102:8080', 'API/selecteds/' + user.email),
         headers: {HttpHeaders.authorizationHeader: user.token});
 
     return parseListSelecteds(response.body);

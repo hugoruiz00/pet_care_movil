@@ -19,7 +19,7 @@ class Products extends StatelessWidget {
 
   Future<List<Product>> fetchProducts(http.Client client) async {
     final response = await http.get(
-        Uri.http('192.168.0.105:8080', 'API/products'),
+        Uri.http('192.168.0.102:8080', 'API/products'),
         headers: {HttpHeaders.authorizationHeader: user.token});
 
     return parseListProducts(response.body);
@@ -187,7 +187,7 @@ Future<String> addProduct(
   Map<String, dynamic> params = {'user': user, 'id': id, 'cantidad': cantidad};
 
   final response = await http.post(
-    Uri.http('192.168.0.105:8080', 'API/addProduct'),
+    Uri.http('192.168.0.102:8080', 'API/addProduct'),
     headers: {
       HttpHeaders.authorizationHeader: token,
       HttpHeaders.contentTypeHeader: "application/json",

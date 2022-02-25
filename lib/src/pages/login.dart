@@ -22,7 +22,7 @@ class _State extends State<LoginPage> {
   Future<List<Login>> postLogin(String user, String password) async {
     List<Login> login = [];
 
-    String url = '192.168.0.105:8080';
+    String url = '192.168.0.102:8080';
 
     Map<String, String> params = {"user": user, "password": password};
 

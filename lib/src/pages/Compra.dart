@@ -22,7 +22,7 @@ class Compra extends StatelessWidget {
 
   Future<List<VentaDetalle>> fetchDetalles(http.Client client) async {
     final response = await http.get(
-        Uri.http('192.168.0.105:8080', 'API/compraDetalle/$idcompra'),
+        Uri.http('192.168.0.102:8080', 'API/compraDetalle/$idcompra'),
         headers: {HttpHeaders.authorizationHeader: user.token});
     return parseListProductos(response.body);
   }
